@@ -4,6 +4,7 @@ import os
 import logging
 import telebot
 from dotenv import load_dotenv
+import pika, sys, os
 
 
 
@@ -17,12 +18,33 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 WEBHOOK_HOST = '<ip/domain>'
 WEBHOOK_PORT = 8443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
-WEBHOOK_URL_BASE = "https://7c62-190-120-248-136.ngrok-free.app"
+WEBHOOK_URL_BASE = "https://7abf-190-120-248-136.ngrok-free.app"
 WEBHOOK_URL_PATH = "/{}/".format(BOT_TOKEN)
 
 app = FastAPI()
 
 bot = telebot.TeleBot(BOT_TOKEN)
+
+
+def receiver():
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+
+    channel.queue_declare(queue='logs')
+
+    log = {}
+    def callback(ch, method, properties, body:dict):
+        print(" [x] Received %r" % body)
+        log = f"This is the body : {body}"
+        bot.send_message(1047727961, log)
+
+    channel.basic_consume(queue='logs', on_message_callback=callback, auto_ack=True)
+   
+
+    print(' [*] Waiting for messages. To exit press CTRL+C')
+    channel.start_consuming()
+
+
 
 @app.post(f'/{BOT_TOKEN}/')
 def process_webhook(update: dict):
@@ -36,7 +58,6 @@ def process_webhook(update: dict):
         return
     
 
-request_time = "time"
 
 
 @app.get("/")
@@ -54,8 +75,8 @@ def index_logs():
             "operating_system":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
             }
     
-    log_format = f"This is the log {log_visit}"
-    bot.send_message(1047727961, log_format)
+    #log_format = f"This is the log {log_visit}"
+    #bot.send_message(1047727961, log_format)
 
     return log_visit
             
@@ -63,8 +84,9 @@ def index_logs():
 message_logs = index_logs()
 
 def sendlogs():
-    print(message_logs)
-    bot.send_message(1047727961, message_logs)
+    message = "This should be a log"
+   
+    return message
 
 
 @bot.message_handler(commands=['start', 'hello'])
@@ -73,12 +95,13 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['logs'])
 def send_welcome(message):
-    bot.reply_to(message, f"Howdy, how are you doing? This is your log: {message_logs}")
+    bot.reply_to(message, f"Howdy, how are you doing? This is your log: {receiver()}")
 
   
-@bot.message_handler(func=sendlogs())
+@bot.message_handler(func=receiver())
 def echo_all(message):
-    message ="This log"
+    message = sendlogs()
+    print(message)
     bot.send_message(1047727961, message)
 
 
@@ -89,6 +112,11 @@ bot.set_webhook(
     url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
     
 )
+
+
+
+
+    
 
 
 if __name__ == "__main__":
