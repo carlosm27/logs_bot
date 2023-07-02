@@ -81,13 +81,6 @@ def index_logs():
     return log_visit
             
 
-message_logs = index_logs()
-
-def sendlogs():
-    message = "This should be a log"
-   
-    return message
-
 
 @bot.message_handler(commands=['start', 'hello'])
 def send_welcome(message):
@@ -100,9 +93,9 @@ def send_welcome(message):
   
 @bot.message_handler(func=receiver())
 def echo_all(message):
-    message = sendlogs()
+    message = "Message sent"
     print(message)
-    bot.send_message(1047727961, message)
+    
 
 
 bot.remove_webhook()
@@ -123,6 +116,6 @@ if __name__ == "__main__":
     
     app.run(app,
     host="127.0.0.1",
-    port=8000)
+    port=5000)
 
    
