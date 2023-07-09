@@ -4,7 +4,6 @@ import telebot
 from dotenv import load_dotenv
 from main import index_logs
 from fastapi import Request
-from receive import receiver
 import pika, sys, os
    
 
