@@ -32,10 +32,9 @@ def receiver():
 
     channel.queue_declare(queue='logs')
 
-    log = {}
     def callback(ch, method, properties, body:dict):
         print(" [x] Received %r" % body)
-        log = f"This is the body : {body}"
+        log = f"This is the log : {body}"
         bot.send_message(1047727961, log)
 
     channel.basic_consume(queue='logs', on_message_callback=callback, auto_ack=True)
@@ -58,27 +57,6 @@ def process_webhook(update: dict):
         return
     
 
-
-
-@app.get("/")
-def index_logs():
-    """Track website visitor."""
-    request_time = datetime.now()
-
-    log_visit = {"ip_address":"127.0.0.1",
-            "request_url":"http://localhost:8000/",
-            "request_port":8000,
-            "request_path":"/",
-            "request_method":"GET",
-            "request_time": request_time,
-            "browser_type":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0",
-            "operating_system":"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
-            }
-    
-    #log_format = f"This is the log {log_visit}"
-    #bot.send_message(1047727961, log_format)
-
-    return log_visit
             
 
 
@@ -86,9 +64,6 @@ def index_logs():
 def send_welcome(message):
     bot.reply_to(message, f"Howdy, how are you doing? This is your chat ID: {message.chat.id}")
 
-@bot.message_handler(commands=['logs'])
-def send_welcome(message):
-    bot.reply_to(message, f"Howdy, how are you doing? This is your log: {receiver()}")
 
   
 @bot.message_handler(func=receiver())
