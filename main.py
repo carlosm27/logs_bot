@@ -24,6 +24,13 @@ WEBHOOK_URL_PATH = "/{}/".format(BOT_TOKEN)
 app = FastAPI()
 
 bot = telebot.TeleBot(BOT_TOKEN)
+bot.remove_webhook()
+
+# Set webhook
+bot.set_webhook(
+    url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+    
+)
 
 
 def receiver():
@@ -68,29 +75,22 @@ def send_welcome(message):
   
 @bot.message_handler(func=receiver())
 def echo_all(message):
-    message = "Message sent"
-    print(message)
+    pass
     
 
 
-bot.remove_webhook()
-
-# Set webhook
-bot.set_webhook(
-    url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
-    
-)
 
 
 
 
+@app.on_event("startup")
+async def startup_event():
+    receiver()
     
 
 
 if __name__ == "__main__":
     
-    app.run(app,
-    host="127.0.0.1",
-    port=5000)
+    app.run()
 
    
