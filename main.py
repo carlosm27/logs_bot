@@ -18,7 +18,7 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 WEBHOOK_HOST = '<ip/domain>'
 WEBHOOK_PORT = 8443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
-WEBHOOK_URL_BASE = "https://7abf-190-120-248-136.ngrok-free.app"
+WEBHOOK_URL_BASE = ""
 WEBHOOK_URL_PATH = "/{}/".format(BOT_TOKEN)
 
 app = FastAPI()
@@ -78,14 +78,6 @@ def echo_all(message):
     pass
     
 
-
-
-
-
-
-@app.on_event("startup")
-async def startup_event():
-    receiver()
     
 
 
